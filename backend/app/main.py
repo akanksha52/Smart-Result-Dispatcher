@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import shutil, os
 from pathlib import Path
 
-from backend.src.generate_pdf import generateReport
+from backend.src.generate_pdf import generateReport, generateAllPdfs
 from backend.src.mailer import renderTemplate, sendEmail
 from backend.src.utils import readStudents, logSend
 
@@ -28,9 +28,9 @@ async def uploadCsv(file: UploadFile=File(...)):
     return {"status": "ok", "saved": str(dest)}
 
 @app.post("/generate-pdfs")
-def genPdfs(background: BackgroundTasks):
-    background.add_task(generateReport)
-    return {"status": "started"}
+def generate_pdfs(background: BackgroundTasks):
+    background.add_task(generateAllPdfs)
+    return {"status": "PDF generation started"}
 
 @app.get("/reports")
 def getReports():

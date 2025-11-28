@@ -1,21 +1,24 @@
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import mm
-import os
+import os, csv
+from pathlib import Path
 
-output_dir=r"C:\Users\akank\Desktop\automation\9 Smart Result dispatcher\output\reports"
-os.makedirs(output_dir, exist_ok=True)
-background_path=r"C:\Users\akank\Desktop\automation\9 Smart Result dispatcher\templates\pdf template.webp"
+baseDir=Path(__file__).resolve().parents[1]
+outputDir=baseDir/"output"/"reports"
+templateDir=baseDir/"templates"
+backgroundPath=templateDir/"pdf_template.webp"
+dataPath=baseDir/"data"/"students.csv"
 
 def generateReport(student: dict) -> str:
     filename=f"{student['name'].replace(' ', '_')}_report.pdf"
-    path=os.path.join(output_dir, filename)
+    path=os.path.join(outputDir, filename)
     
     c=canvas.Canvas(path, pagesize=A4)
     width, height=A4
     
-    if os.path.exists(background_path):
-        c.drawImage(background_path, 0, 0, width=width, height=height)
+    if os.path.exists(backgroundPath):
+        c.drawImage(backgroundPath, 0, 0, width=width, height=height)
     c.setFont("Helvetica-Bold", 26)
     c.drawCentredString(width/2, height-40*mm, "Result Report")
     
@@ -38,3 +41,11 @@ def generateReport(student: dict) -> str:
     c.showPage()
     c.save()
     return path
+
+def generateAllPdfs():
+    with open(dataPath, newline='') as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            generateReport(row)
+
+    return "PDF Generation Completed"
