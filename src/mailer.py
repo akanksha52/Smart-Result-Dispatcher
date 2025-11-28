@@ -24,7 +24,7 @@ def sendEmail(toEmail: str, subject: str, htmlBody: str, attachedPath: str=None)
     msg["From"]=f"{fromName} <{smtpUser}>"
     msg["To"]=toEmail
     msg.set_content("This is an HTML email. Please use an HTML-capable email client.")
-    msg.add_alternative(htmlBody, subType="html")
+    msg.add_alternative(htmlBody, subtype="html")
     
     if attachedPath:
         with open(attachedPath, "rb") as f:

@@ -7,11 +7,12 @@ def readStudents(csvPath):
     return df.to_dict(orient="records")
 
 def logSend(name, email, status, message="", logFile=None):
-    if log_file is None:
-        log_file=os.path.join(os.path.dirname(__file__), "..", "logs", "send_log.csv")
+    if logFile is None:
+        logFile=os.path.join(os.path.dirname(__file__), "..", "logs", "send_log.csv")
     header=["name", "email", "status", "message"]
-    exist=os.path.exists(log_file)
-    with open(log_file, "a", newline="", encoding="utf-8") as f:
+    exist=os.path.exists(logFile)
+    os.makedirs(os.path.dirname(logFile), exist_ok=True)
+    with open(logFile, "a", newline="", encoding="utf-8") as f:
         writer=csv.writer(f)
         if not exist:
             writer.writerow(header)
