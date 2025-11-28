@@ -1,2 +1,9 @@
 pandas
 reportlab
+csv
+time
+argparse
+dotenv
+smtplib
+jinja2
+mimetypes
