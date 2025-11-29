@@ -1,9 +1,8 @@
-import os
+import os, mimetypes, smtplib, csv
 from dotenv import load_dotenv
-import smtplib
 from email.message import EmailMessage
 from jinja2 import Template
-import mimetypes
+from pathlib import Path
 
 envPath=r"C:\Users\akank\Desktop\automation\9 Smart Result dispatcher\.env"
 load_dotenv(envPath)
@@ -12,6 +11,11 @@ smtpPort=int(os.getenv("smtpPort", "587"))
 smtpUser=os.getenv("smtpUser")
 smtpPass=os.getenv("smtpPass")
 fromName=os.getenv("fromName", "Result dispatch")
+
+baseDir=Path(__file__).resolve().parents[1]
+dataPath=baseDir/"data"/"students.csv"
+templateDir=baseDir/"templates"
+outputDir=baseDir/"output"/"reports"
 
 def renderTemplate(templatePath: str, context: dict) -> str:
     with open(templatePath, "r", encoding="utf-8") as f:
@@ -43,3 +47,20 @@ def sendEmail(toEmail: str, subject: str, htmlBody: str, attachedPath: str=None)
             smtp.ehlo()
         smtp.login(smtpUser, smtpPass)
         smtp.send_message(msg)
+
+
+def sendAllEmails():
+    with open(dataPath, newline='') as f:
+        reader=csv.DictReader(f)
+        for row in reader:
+            htmlBody=renderTemplate(str(templateDir/"email_template.html"), row)
+            pdfFilename=f"{row['name'].replace(' ', '_')}_report.pdf"
+            pdfPath=outputDir/pdfFilename
+            sendEmail(
+                toEmail=row.get("email", ""),
+                subject="Your Result Report",
+                htmlBody=htmlBody,
+                attachedPath=str(pdfPath)
+            )
+
+    return "Email Sending Completed"
